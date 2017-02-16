@@ -41,11 +41,19 @@ func WithFilters(fs ...Filter) modules.Option {
 	}
 }
 
+<<<<<<< HEAD:modules/uhttp/http_options.go
 func filtersFromCreateInfo(mci service.ModuleCreateInfo) []Filter {
 	items, ok := mci.Items[_filterKey]
 	if !ok {
 		return nil
 	}
+=======
+// ServeHTTP calls Handler.ServeHTTP( w, r) and injects a new service context for use.
+func (h *handlerWithHost) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx := ulog.NewLogContext(r.Context(), ulog.Logger(r.Context()))
+	stopwatch := stats.HTTPMethodTimer.Timer(r.Method).Start()
+	defer stopwatch.Stop()
+>>>>>>> b69958d... rebase from master:modules/uhttp/handler.go
 
 	// Intentionally panic if programmer adds non-filter slice to the data
 	return items.([]Filter)

@@ -27,7 +27,6 @@ import (
 	"strings"
 	"testing"
 
-	"go.uber.org/fx/auth"
 	"go.uber.org/fx/metrics"
 	"go.uber.org/fx/modules/uhttp/internal/stats"
 	"go.uber.org/fx/service"
@@ -42,6 +41,7 @@ import (
 	"github.com/uber/jaeger-client-go/config"
 )
 
+<<<<<<< HEAD
 func TestDefaultFiltersWithNopHost(t *testing.T) {
 	tests := []struct {
 		desc   string
@@ -131,6 +131,10 @@ func TestDefaultFiltersWithNopHostConfigured(t *testing.T) {
 
 func testFilterChain(t *testing.T, host service.Host) {
 	chain := newFilterChainBuilder(host).AddFilters([]Filter{}...).Build(getNopHandler())
+=======
+func TestFilterChain(t *testing.T) {
+	chain := newFilterChainBuilder().AddFilters([]Filter{}...).Build(getNopHandler())
+>>>>>>> b69958d... rebase from master
 	response := testServeHTTP(chain)
 	assert.True(t, strings.Contains(response.Body.String(), "filters ok"))
 }
@@ -151,9 +155,8 @@ func testTracingFilterWithLogs(t *testing.T) {
 		opentracing.InitGlobalTracer(tracer)
 		defer opentracing.InitGlobalTracer(opentracing.NoopTracer{})
 
-		host := service.NopHostConfigured(auth.NopClient, loggerWithZap, tracer)
-		ulog.SetLogger(host.Logger())
-		chain := newFilterChainBuilder(host).AddFilters([]Filter{contextFilter{host}, tracingServerFilter{}}...).Build(getNopHandler())
+		ulog.SetLogger(loggerWithZap)
+		chain := newFilterChainBuilder().AddFilters([]Filter{contextFilter{loggerWithZap}, tracingServerFilter{}}...).Build(getNopHandler())
 		response := testServeHTTP(chain)
 		assert.Contains(t, response.Body.String(), "filters ok")
 		assert.True(t, len(buf.Lines()) > 0)
@@ -172,8 +175,14 @@ func testTracingFilterWithLogs(t *testing.T) {
 	})
 }
 
+<<<<<<< HEAD
 func testFilterChainFilters(t *testing.T, host service.Host) {
 	chain := newFilterChainBuilder(host).AddFilters(
+=======
+func TestFilterChainFilters(t *testing.T) {
+	host := service.NopHost()
+	chain := newFilterChainBuilder().AddFilters(
+>>>>>>> b69958d... rebase from master
 		tracingServerFilter{},
 		authorizationFilter{
 			authClient: host.AuthClient(),
@@ -183,8 +192,15 @@ func testFilterChainFilters(t *testing.T, host service.Host) {
 	assert.Contains(t, response.Body.String(), "filters ok")
 }
 
+<<<<<<< HEAD
 func testFilterChainFiltersAuthFailure(t *testing.T, host service.Host) {
 	chain := newFilterChainBuilder(host).AddFilters(
+=======
+func TestFilterChainFilters_AuthFailure(t *testing.T) {
+	host := service.NopHostAuthFailure()
+	stats.SetupHTTPMetrics(host.Metrics())
+	chain := newFilterChainBuilder().AddFilters(
+>>>>>>> b69958d... rebase from master
 		tracingServerFilter{},
 		authorizationFilter{
 			authClient: host.AuthClient(),
@@ -194,8 +210,16 @@ func testFilterChainFiltersAuthFailure(t *testing.T, host service.Host) {
 	assert.Equal(t, 401, response.Code)
 }
 
+<<<<<<< HEAD
 func testPanicFilter(t *testing.T, host service.Host) {
 	chain := newFilterChainBuilder(host).AddFilters(
+=======
+func TestPanicFilter(t *testing.T) {
+	host := service.NopHost()
+	testScope := host.Metrics()
+
+	chain := newFilterChainBuilder().AddFilters(
+>>>>>>> b69958d... rebase from master
 		panicFilter{},
 	).Build(getPanicHandler())
 	response := testServeHTTP(chain)
